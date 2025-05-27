@@ -64,6 +64,7 @@ function main() {
 
     const path = 'BUILD_NUMBER/BUILD_NUMBER';
     const prefix = env.INPUT_PREFIX ? `${env.INPUT_PREFIX}-` : '';
+    const deletePreviousTag = env.INPUT_DELETE_PREVIOUS_TAG !== 'false';
 
     //See if we've already generated the build number and are in later steps...
     if (fs.existsSync(path)) {
@@ -136,7 +137,7 @@ function main() {
             fs.writeFileSync('BUILD_NUMBER', nextBuildNumber.toString());
             
             //Cleanup
-            if (nrTags) {
+            if (nrTags && deletePreviousTag) {
                 console.log(`Deleting ${nrTags.length} older build counters...`);
             
                 for (let nrTag of nrTags) {
@@ -148,6 +149,8 @@ function main() {
                         }
                     });
                 }
+            } else if (nrTags && !deletePreviousTag) {
+                console.log('Skipping deletion of previous build-number tags as requested.');
             }
 
         });

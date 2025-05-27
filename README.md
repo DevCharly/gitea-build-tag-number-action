@@ -100,6 +100,21 @@ This will generate a git tag like `client-build-number-1`.
 
 If you then do the same in another workflow and use `prefix: server` then you'll get a second build-number tag called `server-build-number-1`.
 
+### Optional: Not deleting previous tags
+By default, the action deletes the previous build-number tag after creating a new one. If you want to keep all previous build-number tags, set `delete_previous_tag: false`:
+
+```yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Generate build number
+      uses: onyxmueller/build-tag-number@v1
+      with:
+        token: ${{secrets.github_token}}        
+        delete_previous_tag: false
+```
+
 ## Branches and build numbers
 
 The build number generator is global, there's no concept of special build numbers for special branches unless handled manually with the `prefix` property. It's probably something you would just use on builds from your master branch. It's just one number that gets increased every time the action is run.
