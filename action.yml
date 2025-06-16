@@ -12,7 +12,7 @@ inputs:
     description: 'Prefix for the build-number-<num> tag to make it unique if tracking multiple build numbers'
     required: false
   delete_previous_tag:
-    description: 'If set to false, previous build-number tags will not be deleted (default: true)'
+    description: 'If set to false, previous build number tags will not be deleted (default: true)'
     required: false
 
 outputs:

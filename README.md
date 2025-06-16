@@ -100,7 +100,7 @@ This will generate a git tag like `client-build-number-1`.
 
 If you then do the same in another workflow and use `prefix: server` then you'll get a second build-number tag called `server-build-number-1`.
 
-### Optional: Not deleting previous tags
+### Optional: Do not delete previous tags
 By default, the action deletes the previous build-number tag after creating a new one. If you want to keep all previous build-number tags, set `delete_previous_tag: false`:
 
 ```yaml
