@@ -1,4 +1,4 @@
-name: 'Build Tag Number'
+name: 'Gitea Build Tag Number'
 description: 'Sequential build numbers for workflow runs based on Git tag'
 author: 'Onyx Mueller'
 runs:
@@ -6,7 +6,7 @@ runs:
   main: 'main.js'
 inputs:
   token:
-    description: 'GitHub Token to create and delete refs (GITHUB_TOKEN)'
+    description: 'Gitea Token to create and delete refs (GITHUB_TOKEN)'
     required: false # Not required when getting the stored build number for later jobs, only in the first jobs when it's generated
   prefix:
     description: 'Prefix for the build-number-<num> tag to make it unique if tracking multiple build numbers'

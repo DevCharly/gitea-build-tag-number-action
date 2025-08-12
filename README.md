@@ -1,8 +1,6 @@
-# Build Tag Number Action
+# Gitea Build Tag Number Action
 
-[![GitHub Marketplace](https://img.shields.io/badge/Marketplace-Build%20Tag%20Number-blue.svg?colorA=24292e&colorB=0366d6&style=flat&longCache=true&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAM6wAADOsB5dZE0gAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAERSURBVCiRhZG/SsMxFEZPfsVJ61jbxaF0cRQRcRJ9hlYn30IHN/+9iquDCOIsblIrOjqKgy5aKoJQj4O3EEtbPwhJbr6Te28CmdSKeqzeqr0YbfVIrTBKakvtOl5dtTkK+v4HfA9PEyBFCY9AGVgCBLaBp1jPAyfAJ/AAdIEG0dNAiyP7+K1qIfMdonZic6+WJoBJvQlvuwDqcXadUuqPA1NKAlexbRTAIMvMOCjTbMwl1LtI/6KWJ5Q6rT6Ht1MA58AX8Apcqqt5r2qhrgAXQC3CZ6i1+KMd9TRu3MvA3aH/fFPnBodb6oe6HM8+lYHrGdRXW8M9bMZtPXUji69lmf5Cmamq7quNLFZXD9Rq7v0Bpc1o/tp0fisAAAAASUVORK5CYII=)](https://github.com/onyxmueller/build-tag-number)
-
-GitHub action for generating sequential build numbers based on Git tag. The build number is stored in your GitHub repository as a ref, it doesn't add any extra commits to your repository. Use in your workflow like so:
+Gitea action for generating sequential build numbers based on Git tag. The build number is stored in your Gitea repository as a ref, it doesn't add any extra commits to your repository. Use in your workflow like so:
 
 ```yaml
 jobs:
@@ -10,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Generate build number
-      uses: onyxmueller/build-tag-number@v1
+      uses: DevCharly/gitea-build-tag-number-action@v1
       with:
         token: ${{secrets.github_token}}        
     - name: Print new build number
@@ -27,7 +25,7 @@ jobs:
     steps:
     - name: Generate build number
       id: buildnumber
-      uses: onyxmueller/build-tag-number@v1
+      uses: DevCharly/gitea-build-tag-number-action@v1
       with:
         token: ${{secrets.github_token}}        
     
@@ -37,7 +35,7 @@ jobs:
       with:
         who-to-greet: ${{ steps.buildnumber.outputs.build_number }}
 ```
-The `GITHUB_TOKEN` environment variable is defined by GitHub for you. See [virtual environments for GitHub actions](https://help.github.com/en/articles/virtual-environments-for-github-actions#github_token-secret) for more information.
+The `GITHUB_TOKEN` environment variable is defined by Gitea for you. See [virtual environments for GitHub actions](https://help.github.com/en/articles/virtual-environments-for-github-actions#github_token-secret) for more information.
 
 ## Getting the build number in other jobs
 
@@ -53,7 +51,7 @@ jobs:
     steps:
     - name: Generate build number
       id: buildnumber
-      uses: onyxmueller/build-tag-number@v1
+      uses: DevCharly/gitea-build-tag-number-action@v1
       with:
         token: ${{secrets.github_token}}
           
@@ -80,7 +78,7 @@ and then your next build number will be 501. The action will always delete older
 
 ## Generating multiple independent build numbers
 
-Sometimes you may have more than one project to build in one repository. For example, you may have a client and a server in the same GitHub repository that you would like to generate independent build numbers for. Another example is you have two Dockerfiles in one repo and you'd like to version each of the built images with their own numbers.  
+Sometimes you may have more than one project to build in one repository. For example, you may have a client and a server in the same Gitea repository that you would like to generate independent build numbers for. Another example is you have two Dockerfiles in one repo and you'd like to version each of the built images with their own numbers.  
 To do this, use the `prefix` key, like so:
 
 ```yaml
@@ -90,7 +88,7 @@ jobs:
     steps:
     - name: Generate build number
       id: buildnumber
-      uses: onyxmueller/build-tag-number@v1
+      uses: DevCharly/gitea-build-tag-number-action@v1
       with:
         token: ${{ secrets.github_token }}
         prefix: client
@@ -109,7 +107,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Generate build number
-      uses: onyxmueller/build-tag-number@v1
+      uses: DevCharly/gitea-build-tag-number-action@v1
       with:
         token: ${{secrets.github_token}}        
         delete_previous_tag: false
@@ -119,11 +117,7 @@ jobs:
 
 The build number generator is global, there's no concept of special build numbers for special branches unless handled manually with the `prefix` property. It's probably something you would just use on builds from your master branch. It's just one number that gets increased every time the action is run.
 
-## Find this library useful? :raised_hands:
-Support it by joining __[stargazers](https://github.com/onyxmueller/build-tag-number/stargazers)__ for this repository. :star: And __[follow me](https://github.com/onyxmueller)__ for other creations.
-
 ## Credit
 
-This Github Action is based on original work done by Einar Egilsson, which is no longer maintained. You can read more about the original version on his blog:
-
- http://einaregilsson.com/a-github-action-for-generating-sequential-build-numbers/
+This Gitea Action is based on GitHub action done by Onyx Mueller:
+https://github.com/onyxmueller/build-tag-number

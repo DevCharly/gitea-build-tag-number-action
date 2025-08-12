@@ -16,9 +16,6 @@ function request(method, path, data, callback) {
             data = JSON.stringify(data);
         }  
         const options = {
-            hostname: 'api.github.com',
-            port: 443,
-            path,
             method,
             headers: {
                 'Content-Type': 'application/json',
@@ -28,7 +25,7 @@ function request(method, path, data, callback) {
                 'User-Agent' : 'GitHub Action - development'
             }
         }
-        const req = https.request(options, res => {
+        const req = https.request(`${env.GITHUB_API_URL}${path}`, options, res => {
     
             let chunks = [];
             res.on('data', d => chunks.push(d));
@@ -39,11 +36,11 @@ function request(method, path, data, callback) {
                         if (err) {
                             callback(err);
                         } else {
-                            callback(null, res.statusCode, decoded && JSON.parse(decoded));
+                            callback(null, res.statusCode, decoded);
                         }
                     });
                 } else {
-                    callback(null, res.statusCode, buffer.length > 0 ? JSON.parse(buffer) : null);
+                    callback(null, res.statusCode, buffer);
                 }
             });
     
@@ -77,13 +74,13 @@ function main() {
     }
     
     //Some sanity checking:
-    for (let varName of ['INPUT_TOKEN', 'GITHUB_REPOSITORY', 'GITHUB_SHA']) {
+    for (let varName of ['INPUT_TOKEN', 'GITHUB_REPOSITORY', 'GITHUB_SHA', 'GITHUB_API_URL']) {
         if (!env[varName]) {
             fail(`ERROR: Environment variable ${varName} is not defined.`);
         }
     }
 
-    request('GET', `/repos/${env.GITHUB_REPOSITORY}/git/refs/tags/${prefix}build-number-`, null, (err, status, result) => {
+    request('GET', `/repos/${env.GITHUB_REPOSITORY}/git/refs/tags%2F${prefix}build-number-`, null, (err, status, result) => {
     
         let nextBuildNumber, nrTags;
     
@@ -92,6 +89,8 @@ function main() {
             nextBuildNumber = 1;
             nrTags = [];
         } else if (status === 200) {
+            result = result && result.length > 0 ? JSON.parse(result) : null
+
             const regexString = `/${prefix}build-number-(\\d+)$`;
             const regex = new RegExp(regexString);
             nrTags = result.filter(d => d.ref.match(regex));
@@ -105,26 +104,26 @@ function main() {
             let nrs = nrTags.map(t => parseInt(t.ref.match(/-(\d+)$/)[1]));
     
             let currentBuildNumber = Math.max(...nrs);
-            console.log(`Last build nr was ${currentBuildNumber}.`);
+            console.log(`Last build number was ${currentBuildNumber}.`);
     
             nextBuildNumber = currentBuildNumber + 1;
-            console.log(`Updating build counter to ${nextBuildNumber}...`);
+            console.log(`Updating build number to ${nextBuildNumber}...`);
         } else {
-            if (err) {
+            if (err) {
                 fail(`Failed to get refs. Error: ${err}, status: ${status}`);
             } else {
-                fail(`Getting build-number refs failed with http status ${status}, error: ${JSON.stringify(result)}`);
+                fail(`Getting build-number refs failed with http status ${status}, error: ${result}`);
             } 
         }
 
         let newRefData = {
-            ref:`refs/tags/${prefix}build-number-${nextBuildNumber}`, 
-            sha: env.GITHUB_SHA
+            tag_name:`${prefix}build-number-${nextBuildNumber}`, 
+            target: env.GITHUB_SHA
         };
     
-        request('POST', `/repos/${env.GITHUB_REPOSITORY}/git/refs`, newRefData, (err, status, result) => {
+        request('POST', `/repos/${env.GITHUB_REPOSITORY}/tags`, newRefData, (err, status, result) => {
             if (status !== 201 || err) {
-                fail(`Failed to create new build-number ref. Status: ${status}, err: ${err}, result: ${JSON.stringify(result)}`);
+                fail(`Failed to create new build-number ref. Status: ${status}, err: ${err}, result: ${result}`);
             }
 
             console.log(`Successfully updated build number to ${nextBuildNumber}`);
@@ -138,12 +137,12 @@ function main() {
             
             //Cleanup
             if (nrTags && deletePreviousTag) {
-                console.log(`Deleting ${nrTags.length} older build counters...`);
+                console.log(`Deleting ${nrTags.length} older build numbers...`);
             
-                for (let nrTag of nrTags) {
-                    request('DELETE', `/repos/${env.GITHUB_REPOSITORY}/git/${nrTag.ref}`, null, (err, status, result) => {
+                for (let nrTag of nrTags) {
+                    request('DELETE', `/repos/${env.GITHUB_REPOSITORY}/tags/${nrTag.ref.replace('refs/tags/', '')}`, null, (err, status, result) => {
                         if (status !== 204 || err) {
-                            console.warn(`Failed to delete ref ${nrTag.ref}, status: ${status}, err: ${err}, result: ${JSON.stringify(result)}`);
+                            console.warn(`Failed to delete ref ${nrTag.ref}, status: ${status}, err: ${err}, result: ${result}`);
                         } else {
                             console.log(`Deleted ${nrTag.ref}`);
                         }
